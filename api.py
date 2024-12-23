@@ -83,12 +83,19 @@ category_mismatch = {
 def train_model(last_article: str = None, triplets_per_ancor: int = 100, num_epochs: int = 10):
     recommends = get_recommends(last_article)
     photos_with_categories = get_photos_with_categories()
+    if len(recommends.get("recommends", [])) == 0:
+        return {"error": recommends.get("error")}
+    if len(photos_with_categories.get("photos_with_categories", [])) == 0:
+        return {"error": photos_with_categories.get("error")}
+    photos_with_categories = photos_with_categories.get("photos_with_categories", [])
+    recommends = recommends.get("recommends", [])
+
     dataset = TripletDataset(category_mismatch, 
                              recommends, 
                              photos_with_categories,
                              transform=transform, 
                              triplets_per_anchor=triplets_per_ancor)
-    
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = EmbeddingModel().to(device)
     model.load_state_dict(torch.load(MODEL_SAVE_PATH, weights_only=True, map_location=torch.device(device)))
@@ -123,7 +130,8 @@ def train_model(last_article: str = None, triplets_per_ancor: int = 100, num_epo
     avg_train_loss /= num_epochs
     avg_test_loss /= num_epochs
 
-    response = f"The model has been succesfully trained. Average train loss: {avg_train_loss:.3f}, average test loss: {avg_test_loss:.3f}"
+    response = {"error": "No errors", "response":
+                f"The model has been succesfully trained. Average train loss: {avg_train_loss:.3f}, average test loss: {avg_test_loss:.3f}"}
     return response
 
 @app.get("/mm/api/v1/create-image-embedding/")

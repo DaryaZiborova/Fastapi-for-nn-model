@@ -135,8 +135,11 @@ def get_embedding(img_url):
 
     with torch.no_grad():
         image = get_PIL_image(img_url)
-        image = transform(image).unsqueeze(0).to(device)
-        embedding = model(image).squeeze(0).cpu()
-        embedding = embedding.numpy().tolist()
+        if image:
+            image = transform(image).unsqueeze(0).to(device)
+            embedding = model(image).squeeze(0).cpu()
+            embedding = embedding.numpy().tolist()
+        else:
+            return {"error": "Invalid url or image", "embedding": []}
 
-    return embedding    
+    return {"error": "No errors", "embedding": embedding} 

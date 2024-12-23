@@ -23,8 +23,10 @@ def get_suiting_articles(article, top_n):
         cursor.execute(search_query, (article,))
         embedding_result = cursor.fetchone()
 
-        if not embedding_result or embedding_result[0] == None:
-            return articles
+        if not embedding_result:
+            return {"error": "No such article in the database", "articles": []}
+        if not embedding_result[0]:
+            return {"error": "No image embedding found for provided article", "articles": []}
 
         search_query = "SELECT article FROM products ORDER BY photo_embedding <-> %s::vector LIMIT %s;"
         cursor.execute(search_query, (embedding_result[0], top_n))
@@ -32,14 +34,15 @@ def get_suiting_articles(article, top_n):
         results = cursor.fetchall()
         articles = [row[0] for row in results]
 
+        return {"error": "No errors", "articles": articles}
+    
     except Exception as error:
-        return f"Error: {error}"
+        return {"error": error, "articles": []}
 
     finally:
         if connection:
             cursor.close()
             connection.close()
-            return articles
         else:
-            return "Connection to the database hasn't been succesful"
+            return {"error": "Connection to the database hasn't been succesful", "articles": []}
         
