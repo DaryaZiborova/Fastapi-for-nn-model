@@ -42,7 +42,7 @@ def get_category(article):
 
     return None
 
-def get_recommends(last_article=None):
+def get_recommends(first_article=None):
     url = "https://chereggio.online/mm/api/v1/products_with_recommends"
     headers = {
         "Authorization": f"Bearer {API_TOKEN}"
@@ -63,7 +63,7 @@ def get_recommends(last_article=None):
 
     recommends_list = []
     for i, product in enumerate(recommends):
-        if (product["product_article"] == last_article) or (last_article == None):
+        if (product["product_article"] == first_article) or (first_article == None):
             for product in recommends[i:]:
                 transformed = {
                     "product_id": product["product_id"],

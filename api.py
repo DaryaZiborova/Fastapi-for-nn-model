@@ -80,8 +80,8 @@ category_mismatch = {
 }
 
 @app.put("/mm/api/v1/train-stylist-model/")
-def train_model(last_article: str = None, triplets_per_ancor: int = 100, num_epochs: int = 10):
-    recommends = get_recommends(last_article)
+def train_model(first_article: str = None, triplets_per_ancor: int = 100, num_epochs: int = 10):
+    recommends = get_recommends(first_article)
     photos_with_categories = get_photos_with_categories()
     if len(recommends.get("recommends", [])) == 0:
         return {"error": recommends.get("error")}
